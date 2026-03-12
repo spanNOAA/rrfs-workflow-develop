@@ -40,12 +40,14 @@ EXEC="${HOMErrfs}/sorc/RDASApp/build/bin/mpasjedi_variational.x"
 EXEC2="${HOMErrfs}/sorc/RDASApp/build/bin/bufr2ioda.x"
 EXEC3="${HOMErrfs}/sorc/RDASApp/build/bin/mpasjedi_enkf.x"
 EXEC4="${HOMErrfs}/sorc/RDASApp/build/bin/bufr2netcdf.x"
-EXEC5="${HOMErrfs}/sorc/RDASApp/build/bin/mpasjedi_hofx3d.x"
 cd "${HOMErrfs}/sorc/RDASApp" || exit 1
 
 # workaround for using the GSL surface operator
 # https://github.com/JCSDA-internal/ufo/pull/3622 by Sijie
 cp ../_workaround_/RDASApp/sfccorrected/* sorc/ufo/src/ufo/operators/sfccorrected/
+
+# workaround for using terrain adjustment in sattcwv
+cp ../_workaround_/RDASApp/sattcwv/* sorc/ufo/src/ufo/operators/sattcwv/
 
 # workaround for direct radar refl DA
 # https://github.com/JCSDA-internal/mpas-jedi/pull/1045 by Yongming Wang
@@ -55,7 +57,7 @@ cp ../_workaround_/RDASApp/mpas-jedi/mpas2ufo_vars_mod.F90 sorc/mpas-jedi/src/mp
 
 # workaround for GSIbec
 # no PR yet
-cp ../_workaround_/RDASApp/gsibec/* sorc/gsibec/src/gsibec/gsi/
+cp ../_workaround_/RDASApp/gsibec/* sorc/gsibec/src/gsibec/gsi
 
 cp ../_workaround_/RDASApp/saber/gsi_covariance_mod.f90 sorc/saber/src/saber/gsi/covariance/gsi_covariance_mod.f90
 cp ../_workaround_/RDASApp/saber/gsi_grid_mod.f90 sorc/saber/src/saber/gsi/grid/gsi_grid_mod.f90
@@ -63,7 +65,7 @@ cp ../_workaround_/RDASApp/saber/GridCheckHelper.cc sorc/saber/src/saber/gsi/uti
 cp ../_workaround_/RDASApp/saber/GSIParameters.h sorc/saber/src/saber/gsi/utils/GSIParameters.h
 cp ../_workaround_/RDASApp/saber/Geometry.cc sorc/saber/src/saber/interpolation/Geometry.cc
 
-rm -rf build/
+#rm -rf build/
 ./build.sh -m MPAS -t NO -w NO -b NO
 
 mkdir -p "${HOMErrfs}/exec"
@@ -78,7 +80,4 @@ cp "${EXEC3}" "${HOMErrfs}/exec/mpasjedi_enkf.x"
 
 echo "copy ${EXEC4} to ../exec/bufr2netcdf.x"
 cp "${EXEC4}" "${HOMErrfs}/exec/bufr2netcdf.x"
-
-echo "copy ${EXEC5} to ../exec/mpasjedi_hofx3d.x"
-cp "${EXEC5}" "${HOMErrfs}/exec/mpasjedi_hofx3d.x"
 exit 0

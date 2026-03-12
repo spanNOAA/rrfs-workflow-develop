@@ -1,0 +1,149 @@
+/*
+ *
+ * Crown Copyright 2021 Met Office
+ *
+ * This software is licensed under the terms of the Apache Licence Version 2.0
+ * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
+ */
+
+#include "ufo/operators/sattcwv/SatTCWV.h"
+
+#include <ostream>
+#include <string>
+#include <vector>
+
+#include "ioda/ObsVector.h"
+
+#include "oops/base/Variables.h"
+#include "oops/util/Logger.h"
+
+#include "ufo/GeoVaLs.h"
+#include "ufo/ObsDiagnostics.h"
+#include "ufo/utils/Constants.h"
+
+namespace ufo {
+
+// ----------------------------------------------------------------------------
+static ObsOperatorMaker<SatTCWV> makerSatTCWV_("SatTCWV");
+// -----------------------------------------------------------------------------
+
+SatTCWV::SatTCWV(const ioda::ObsSpace & odb,
+                 const Parameters_ & params)
+        : ObsOperatorBase(odb), varin_(), odb_(odb), params_(params)
+{
+  std::vector<std::string> vv{"air_pressure_levels",
+                              "water_vapor_mixing_ratio_wrt_moist_air",
+                              "air_pressure_at_surface"};
+  if (params.terrainMatch.value()) {
+    vv.push_back("air_temperature");
+    vv.push_back("height_above_mean_sea_level_at_surface");
+  }
+  varin_.reset(new oops::Variables(vv));
+
+  oops::Log::trace() << "SatTCWV constructor done." << std::endl;
+}
+
+// -----------------------------------------------------------------------------
+
+SatTCWV::~SatTCWV() {
+  oops::Log::trace() << "SatTCWV destructor done" << std::endl;
+}
+
+// -----------------------------------------------------------------------------
+
+void SatTCWV::simulateObs(const GeoVaLs & geovals, ioda::ObsVector & hofx,
+		         ObsDiagnostics & d, const QCFlags_t & qc_flags) const {
+  oops::Log::trace() << "SatTCWV::simulateObs start" << std::endl;
+  // Check hofx size and initialise hofx to zero
+  ASSERT(geovals.nlocs() == hofx.nlocs());
+  hofx.zero();
+
+  // Setup parameters used throughout
+  const float missing = util::missingValue<float>();
+
+  // Get number of obs locations & number of model pressure levels
+  std::size_t nprofiles = geovals.nlocs();
+  // number of full (rho) levels
+  std::size_t nlevels   = geovals.nlevs(oops::Variable{"air_pressure_levels"});
+
+  // Get 2-D surface pressure
+  std::vector<float> ps(nprofiles);  // surface pressure (Pa)
+  geovals.get(ps, oops::Variable{"air_pressure_at_surface"});
+
+  // Get 3-D air pressure on rho levels (Pa), one level at a time
+  std::vector<std::vector<float>> plev(nlevels, std::vector<float>(nprofiles));
+  for (std::size_t lev = 0; lev < nlevels; ++lev) {
+    geovals.getAtLevel(plev[lev], oops::Variable{"air_pressure_levels"}, lev);
+  }
+
+  // Get 3-D specific humidity on theta levels (kg/kg), one level at a time
+  std::vector<std::vector<float>> q(nlevels-1, std::vector<float>(nprofiles));
+  for (std::size_t lev = 0; lev < nlevels-1; ++lev) {
+    geovals.getAtLevel(q[lev], oops::Variable{
+        "water_vapor_mixing_ratio_wrt_moist_air"}, lev);
+  }
+
+  // Get surface height, air temperature and air pressure at lowest mass level,
+  // and obs station elevation if terrainMatch is enabled
+  std::vector<float> zs; // surface height (m)
+  std::vector<float> t_mass1; // air temperature (K) at first mass level
+  std::vector<float> p_mass1; // air pressure (Pa) at first mass level
+  std::vector<float> obs_height; // station elevation (m)
+  if (params_.terrainMatch.value()) {
+    zs.resize(nprofiles);
+    geovals.get(zs, oops::Variable{"height_above_mean_sea_level_at_surface"});
+
+    t_mass1.resize(nprofiles);
+    geovals.getAtLevel(t_mass1, oops::Variable{"air_temperature"}, nlevels-2);
+
+    p_mass1.resize(nprofiles);
+    geovals.getAtLevel(p_mass1, oops::Variable{"air_pressure"}, nlevels-2);
+
+    obs_height.resize(nprofiles);
+    odb_.get_db("MetaData", params_.obsHeightName.value(), obs_height);
+  }
+
+  // Check model fields are top-down, fail if not
+  if (plev.front() > plev.back()) {
+    throw eckit::BadValue("model fields must be ordered from the top down", Here());
+  }
+
+  // Calculate TCWV for each profile, integrating over each layer
+
+  // Loop over profiles
+  for (size_t prof = 0; prof < nprofiles; ++prof) {
+    // Start with lowest model layer, using surface pressure
+    // NB this assumes surface q is same as q 10m but could use q2m in future
+    hofx[prof] = (ps[prof] - plev[nlevels - 2][prof]) *
+                 q[nlevels - 2][prof] / Constants::grav;
+
+    // Loop over the rest of the model layers
+    for (size_t lev = 0; lev < nlevels - 2; ++lev) {
+      hofx[prof] += (plev[lev+1][prof] - plev[lev][prof]) *
+                    q[lev][prof] / Constants::grav;
+    }
+
+    // Add terrain match adjustment if terrainMatch is enabled
+    if (params_.terrainMatch.value()) {
+      if (zs[prof] != missing && obs_height[prof] != missing &&
+          t_mass1[prof] != missing && p_mass1[prof] != missing) {
+        float hofx_terrain = (zs[prof] - obs_height[prof]) *
+                             (p_mass1[prof] * q[nlevels - 2][prof]) /
+                             (ufo::Constants::rd * t_mass1[prof]);
+        hofx[prof] += hofx_terrain;
+      }
+    }
+  }
+
+  oops::Log::trace() << "SatTCWV::simulateObs done" <<  std::endl;
+}
+
+// -----------------------------------------------------------------------------
+
+void SatTCWV::print(std::ostream & os) const {
+  os << "SatTCWV::print not implemented";
+}
+
+// -----------------------------------------------------------------------------
+
+}  // namespace ufo
