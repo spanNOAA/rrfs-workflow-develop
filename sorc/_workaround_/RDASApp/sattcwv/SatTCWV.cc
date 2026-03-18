@@ -34,8 +34,9 @@ SatTCWV::SatTCWV(const ioda::ObsSpace & odb,
   std::vector<std::string> vv{"air_pressure_levels",
                               "water_vapor_mixing_ratio_wrt_moist_air",
                               "air_pressure_at_surface"};
-  if (params.terrainMatch.value()) {
+  if (params_.terrainMatch.value()) {
     vv.push_back("air_temperature");
+    vv.push_back("air_pressure");
     vv.push_back("height_above_mean_sea_level_at_surface");
   }
   varin_.reset(new oops::Variables(vv));

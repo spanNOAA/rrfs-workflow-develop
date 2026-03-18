@@ -79,8 +79,7 @@ class SatTCWV : public ObsOperatorBase,
 
   const ioda::ObsSpace & odb_;
 
- protected:
-  Parameters_ params_;
+  const Parameters_ params_;
 };
 
 // -----------------------------------------------------------------------------
