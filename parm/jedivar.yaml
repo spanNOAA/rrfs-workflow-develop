@@ -216,6 +216,7 @@ cost function:
 
        obs operator:
          name: SatTCWV
+         terrainMatch: true
 
        obs localizations:
          - localization method: Horizontal Gaspari-Cohn
