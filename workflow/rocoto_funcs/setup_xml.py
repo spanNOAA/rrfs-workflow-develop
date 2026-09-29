@@ -229,6 +229,8 @@ def setup_xml(HOMErrfs, expdir):
         extra = "\nmodule use /work/noaa/zrtrr/gge/hercules/rocoto/modulefiles"
     elif machine in ['gaeac6']:
         extra = "\nmodule use /gpfs/f6/arfs-gsl/world-shared/gge/rocoto/modulefiles"
+    elif machine in ['gaeac7']:
+        extra = "\nmodule use /gpfs/f7/arfs-gsl/world-shared/gge/rocoto/modulefiles"
     elif machine in ['ursa']:
         extra = "\nmodule use /scratch4/BMC/zrtrr/gge/rocoto/modulefiles"
     elif machine in ['hera']:
@@ -243,9 +245,10 @@ def setup_xml(HOMErrfs, expdir):
     example = f'''## Example crontab entry (use "crontab -e" to modify crontab):
 ## */5 * * * * {fPath}'''
     tail = ""
-    if machine in ['gaeac6']:
+    if machine in ['gaeac6', 'gaeac7']:
+        c_num = 'c7' if machine == 'gaeac7' else 'c6'
         example = f'''## Example scrontab entry (remove the first "#" and use "scrontab -e" to modify scrontab):
-##SCRON --partition=cron_c6
+##SCRON --partition=cron_{c_num}
 ##SCRON --account=@your_account@
 ##SCRON --time=00:05:00
 ##SCRON --mem=8G
