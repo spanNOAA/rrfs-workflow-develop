@@ -23,6 +23,7 @@ fix/ea5km
 fix/global*km
 fix/eu12km
 fix/fwx1p25km
+fix/conus3p5km
 pygraf
 tests/xml
 tests/yaml
