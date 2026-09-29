@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 # First detect w/ hostname
 export MACHINE
-if [[ "${MACHINE:-''}" == "hostgeneric" ]]; then
-  return 0
-fi
 case $(hostname -f) in
 
   adecflow0[12].acorn.wcoss2.ncep.noaa.gov)  MACHINE=acorn ;; ### acorn
@@ -30,7 +27,7 @@ case $(hostname -f) in
 
   derecho*) MACHINE=derecho ;;
 
-  s4-submit.ssec.wisc.edu) MACHINE=s4 ;; ### s4
+  # s4-submit.ssec.wisc.edu) MACHINE=s4 ;; ### s4
 
   fe[1-8]) MACHINE=jet ;; ### jet01-8
   tfe[12]) MACHINE=jet ;; ### tjet1-2
@@ -39,11 +36,11 @@ case $(hostname -f) in
 
   hercules*|Hercules*) MACHINE=hercules ;;
 
-  login[1-4].stampede2.tacc.utexas.edu) MACHINE=stampede ;; ### stampede1-4
+  # login[1-4].stampede2.tacc.utexas.edu) MACHINE=stampede ;; ### stampede1-4
 
-  login0[1-2].expanse.sdsc.edu) MACHINE=expanse ;; ### expanse1-2
+  # login0[1-2].expanse.sdsc.edu) MACHINE=expanse ;; ### expanse1-2
 
-  discover3[1-5].prv.cube) MACHINE=discover ;; ### discover31-35
+  # discover3[1-5].prv.cube) MACHINE=discover ;; ### discover31-35
   *) MACHINE=UNKNOWN ;;  # Unknown platform
 esac
 
@@ -94,9 +91,9 @@ if [[ "${MACHINE}" == "UNKNOWN" ]]; then
   elif [[ -d /gpfs/f7 && -d /ncrc ]]; then
     # We are on GAEA C7
     MACHINE=gaeac7
-  elif [[ -d /data/prod ]]; then
-    # We are on SSEC's S4
-    MACHINE=s4
+  #elif [[ -d /data/prod ]]; then
+  #  # We are on SSEC's S4
+  #  MACHINE=s4
   else
     echo WARNING: UNKNOWN PLATFORM 1>&2
   fi

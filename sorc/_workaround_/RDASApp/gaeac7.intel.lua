@@ -44,7 +44,7 @@ whatis("Description: Load all libraries needed for RDASApp")
 
 local my_path = myFileName()
 if my_path then
-  local repo_root = my_path:match("(.*)/sorc/RDASApp/modulefiles/RDAS/.*") or my_path:match("(.*)/sorc/generic_build/modulefiles/.*")
+  local repo_root = my_path:match("(.*)/sorc/RDASApp/modulefiles/RDAS/.*")
   if repo_root then
     prepend_path("LD_LIBRARY_PATH", pathJoin(repo_root, "sorc/RDASApp/build/lib"))
   end

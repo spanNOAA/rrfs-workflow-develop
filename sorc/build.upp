@@ -14,6 +14,13 @@ rm -rf "${HOMErrfs}/sorc/UPP/tests/build"
 rm -rf "${HOMErrfs}/sorc/UPP/tests/install"
 rm -rf "${EXEC}"
 
+if [[ -d "${HOMErrfs}/sorc/_workaround_/UPP" ]]; then
+  mkdir -p "${HOMErrfs}/sorc/UPP/tests" "${HOMErrfs}/sorc/UPP/modulefiles"
+  [[ -f "${HOMErrfs}/sorc/_workaround_/UPP/detect_machine.sh" ]] && cp "${HOMErrfs}/sorc/_workaround_/UPP/detect_machine.sh" "${HOMErrfs}/sorc/UPP/tests/detect_machine.sh"
+  [[ -f "${HOMErrfs}/sorc/_workaround_/UPP/compile_upp.sh" ]] && cp "${HOMErrfs}/sorc/_workaround_/UPP/compile_upp.sh" "${HOMErrfs}/sorc/UPP/tests/compile_upp.sh"
+  [[ -f "${HOMErrfs}/sorc/_workaround_/UPP/gaeac7_intel.lua" ]] && cp "${HOMErrfs}/sorc/_workaround_/UPP/gaeac7_intel.lua" "${HOMErrfs}/sorc/UPP/modulefiles/gaeac7_intel.lua"
+fi
+
 cd "${HOMErrfs}/sorc/UPP/tests" || exit 1
 ./compile_upp.sh
 

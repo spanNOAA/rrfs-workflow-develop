@@ -1,9 +1,8 @@
 help([[
-  This module loads libraries required for building and running UPP
-  on the NOAA RDHPC machine Gaea C7 using Intel oneAPI 2024.2.1.
+This module loads libraries for rrfs-workflow
 ]])
 
-whatis([===[Loads libraries needed for building the UPP on Gaea C7 ]===])
+whatis([===[Loads libraries for rrfs-workflow ]===])
 
 prepend_path("MODULEPATH", "/opt/cray/modulefiles")
 prepend_path("MODULEPATH", "/opt/cray/pe/lmod/modulefiles/craype-targets/default")
@@ -13,19 +12,26 @@ prepend_path("MODULEPATH", "/gpfs/f7/wrfruc/world-shared/spack-stack/spack-stack
 load("stack-oneapi/2024.2.1")
 load("stack-cray-mpich/8.1.32")
 load("cmake/3.27.9")
-setenv("zlib_ver", "1.2.11")
-load("upp_common")
 
-unload("darshan-runtime")
--- unload("cray-libsci")
+load("parallelio/2.6.2")
+load("jasper/2.0.32")
+load("libpng/1.6.37")
+load("g2/3.5.1")
+load("g2tmpl/1.13.0")
+load("w3emc/2.10.0")
+load("w3nco/2.4.1")
+load("wgrib2/3.6.0")
+load("ncio/1.1.2")
+load("nco/5.2.4")
+load("bufr/12.1.0")
 
-setenv("CC","cc")
-setenv("CXX","CC")
-setenv("FC","ftn")
-
-setenv("CMAKE_Platform","gaea.intel")
+setenv("CMAKE_C_COMPILER", "mpicc")
+setenv("CMAKE_CXX_COMPILER", "mpic++")
+setenv("CMAKE_Fortran_COMPILER", "mpifort")
 
 setenv("AR", "llvm-ar")
 setenv("RANLIB", "llvm-ranlib")
 setenv("CMAKE_AR", "/usr/bin/llvm-ar")
 setenv("CMAKE_RANLIB", "/usr/bin/llvm-ranlib")
+
+remove_path("LD_LIBRARY_PATH", "/opt/intel/oneapi/compiler/2024.2/lib")

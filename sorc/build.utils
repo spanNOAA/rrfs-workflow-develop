@@ -7,6 +7,13 @@ HOMErrfs="$(dirname "$rundir")"
 source "${HOMErrfs}"/workflow/tools/detect_machine.sh
 "${HOMErrfs}"/workflow/tools/init.sh
 
+if [[ -d "${HOMErrfs}/sorc/_workaround_/RRFS_UTILS" ]]; then
+  mkdir -p "${HOMErrfs}/sorc/RRFS_UTILS/modulefiles"
+  [[ -f "${HOMErrfs}/sorc/_workaround_/RRFS_UTILS/detect_machine.sh" ]] && cp "${HOMErrfs}/sorc/_workaround_/RRFS_UTILS/detect_machine.sh" "${HOMErrfs}/sorc/RRFS_UTILS/detect_machine.sh"
+  [[ -f "${HOMErrfs}/sorc/_workaround_/RRFS_UTILS/build.sh" ]] && cp "${HOMErrfs}/sorc/_workaround_/RRFS_UTILS/build.sh" "${HOMErrfs}/sorc/RRFS_UTILS/build.sh"
+  [[ -f "${HOMErrfs}/sorc/_workaround_/RRFS_UTILS/build_gaeac7_intel.lua" ]] && cp "${HOMErrfs}/sorc/_workaround_/RRFS_UTILS/build_gaeac7_intel.lua" "${HOMErrfs}/sorc/RRFS_UTILS/modulefiles/build_gaeac7_intel.lua"
+fi
+
 cd "${HOMErrfs}/sorc/RRFS_UTILS" || exit
 rm -rf build/
 ./build.sh

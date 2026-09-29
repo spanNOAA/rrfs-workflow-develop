@@ -48,6 +48,13 @@ cd "${HOMErrfs}/sorc/RDASApp" || exit 1
 # Temporary workaround to revert a change in saber PR 1254
 cp "${HOMErrfs}/sorc/_workaround_/saber/gsi_covariance_mod.f90" "${HOMErrfs}/sorc/RDASApp/sorc/saber/src/saber/gsi/covariance/gsi_covariance_mod.f90"
 
+if [[ -d "${HOMErrfs}/sorc/_workaround_/RDASApp" ]]; then
+  mkdir -p "${HOMErrfs}/sorc/RDASApp/ush" "${HOMErrfs}/sorc/RDASApp/modulefiles/RDAS"
+  [[ -f "${HOMErrfs}/sorc/_workaround_/RDASApp/detect_machine.sh" ]] && cp "${HOMErrfs}/sorc/_workaround_/RDASApp/detect_machine.sh" "${HOMErrfs}/sorc/RDASApp/ush/detect_machine.sh"
+  [[ -f "${HOMErrfs}/sorc/_workaround_/RDASApp/build.sh" ]] && cp "${HOMErrfs}/sorc/_workaround_/RDASApp/build.sh" "${HOMErrfs}/sorc/RDASApp/build.sh"
+  [[ -f "${HOMErrfs}/sorc/_workaround_/RDASApp/gaeac7.intel.lua" ]] && cp "${HOMErrfs}/sorc/_workaround_/RDASApp/gaeac7.intel.lua" "${HOMErrfs}/sorc/RDASApp/modulefiles/RDAS/gaeac7.intel.lua"
+fi
+
 rm -rf build/
 
 extra=()

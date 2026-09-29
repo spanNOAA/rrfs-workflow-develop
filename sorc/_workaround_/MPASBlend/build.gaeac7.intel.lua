@@ -1,9 +1,8 @@
 help([[
-  This module loads libraries required for building and running UPP
-  on the NOAA RDHPC machine Gaea C7 using Intel oneAPI 2024.2.1.
+This module loads libraries for MPASBlend
 ]])
 
-whatis([===[Loads libraries needed for building the UPP on Gaea C7 ]===])
+whatis([===[Loads libraries for MPASBlend ]===])
 
 prepend_path("MODULEPATH", "/opt/cray/modulefiles")
 prepend_path("MODULEPATH", "/opt/cray/pe/lmod/modulefiles/craype-targets/default")
@@ -12,18 +11,13 @@ prepend_path("MODULEPATH", "/gpfs/f7/wrfruc/world-shared/spack-stack/spack-stack
 
 load("stack-oneapi/2024.2.1")
 load("stack-cray-mpich/8.1.32")
+
 load("cmake/3.27.9")
-setenv("zlib_ver", "1.2.11")
-load("upp_common")
+load("esmf/8.8.0")
 
-unload("darshan-runtime")
--- unload("cray-libsci")
-
-setenv("CC","cc")
-setenv("CXX","CC")
-setenv("FC","ftn")
-
-setenv("CMAKE_Platform","gaea.intel")
+setenv("CMAKE_C_COMPILER", "mpicc")
+setenv("CMAKE_CXX_COMPILER", "mpic++")
+setenv("CMAKE_Fortran_COMPILER", "mpifort")
 
 setenv("AR", "llvm-ar")
 setenv("RANLIB", "llvm-ranlib")

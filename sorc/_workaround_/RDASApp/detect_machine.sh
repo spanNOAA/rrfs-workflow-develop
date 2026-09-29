@@ -1,0 +1,109 @@
+#!/bin/bash
+
+# The authoritative copy of this script lives in the ufs-weather-model at:
+# https://github.com/ufs-community/ufs-weather-model/blob/develop/tests/detect_machine.sh
+# If any local modifications are made or new platform support added,
+# please consider opening an issue and a PR to the ufs-weather-model
+# so that this copy remains in sync with its authoritative source
+#
+# Thank you for your contribution
+
+# First detect w/ hostname
+if [[ "${MACHINE:-''}" == "hostgeneric" ]]; then
+  MACHINE_ID="hostgeneric"
+  return 0
+fi
+case $(hostname -f) in
+
+  adecflow0[12].acorn.wcoss2.ncep.noaa.gov)  MACHINE_ID=acorn ;; ### acorn
+  alogin0[12].acorn.wcoss2.ncep.noaa.gov)    MACHINE_ID=acorn ;; ### acorn
+  clogin0[1-9].cactus.wcoss2.ncep.noaa.gov)  MACHINE_ID=wcoss2 ;; ### cactus01-9
+  clogin10.cactus.wcoss2.ncep.noaa.gov)      MACHINE_ID=wcoss2 ;; ### cactus10
+  dlogin0[1-9].dogwood.wcoss2.ncep.noaa.gov) MACHINE_ID=wcoss2 ;; ### dogwood01-9
+  dlogin10.dogwood.wcoss2.ncep.noaa.gov)     MACHINE_ID=wcoss2 ;; ### dogwood10
+
+  gaea|gaea5[1-8])     MACHINE_ID=gaeac5 ;;
+  gaea6[1-8])          MACHINE_ID=gaeac6 ;;
+  gaea.ncrc.gov|gaea5[1-8].ncrc.gov) MACHINE_ID=gaeac5 ;;
+  gaea6[1-8].ncrc.gov)               MACHINE_ID=gaeac6 ;;
+  gaea7[1-8]|c7n*)                   MACHINE_ID=gaeac7 ;;
+  gaea7[1-8].ncrc.gov)               MACHINE_ID=gaeac7 ;;
+
+  hfe0[1-9]) MACHINE_ID=hera ;; ### hera01-09
+  hfe1[0-2]) MACHINE_ID=hera ;; ### hera10-12
+  hecflow01) MACHINE_ID=hera ;; ### heraecflow01
+
+  ufe*) MACHINE_ID=ursa ;;
+  uecflow01) MACHINE_ID=ursa ;;
+
+  derecho*) MACHINE_ID=derecho ;;
+
+  s4-submit.ssec.wisc.edu) MACHINE_ID=s4 ;; ### s4
+
+  fe[1-8]) MACHINE_ID=jet ;; ### jet01-8
+  tfe[12]) MACHINE_ID=jet ;; ### tjet1-2
+
+  Orion-login-[1-4].HPC.MsState.Edu) MACHINE_ID=orion ;; ### orion1-4
+
+  [Hh]ercules-login-[1-4].[Hh][Pp][Cc].[Mm]s[Ss]tate.[Ee]du) MACHINE_ID=hercules ;; ### hercules1-4
+
+  login[1-4].stampede2.tacc.utexas.edu) MACHINE_ID=stampede ;; ### stampede1-4
+
+  login0[1-2].expanse.sdsc.edu) MACHINE_ID=expanse ;; ### expanse1-2
+
+  discover3[1-5].prv.cube) MACHINE_ID=discover ;; ### discover31-35
+  *) MACHINE_ID=UNKNOWN ;;  # Unknown platform
+esac
+
+if [[ ${MACHINE_ID} == "UNKNOWN" ]]; then 
+   case ${PW_CSP:-} in
+      "aws" | "google" | "azure") MACHINE_ID=noaacloud ;;
+      *) PW_CSP="UNKNOWN"
+   esac
+fi
+
+# If MACHINE_ID is no longer UNKNNOWN, return it
+if [[ "${MACHINE_ID}" != "UNKNOWN" ]]; then
+  return
+fi
+
+# Try searching based on paths since hostname may not match on compute nodes
+if [[ -d /lfs/h3 ]]; then
+  # We are on NOAA Cactus or Dogwood
+  MACHINE_ID=wcoss2
+elif [[ -d /lfs/h1 && ! -d /lfs/h3 ]]; then
+  # We are on NOAA TDS Acorn
+  MACHINE_ID=acorn
+elif [[ -d /mnt/lfs5 ]]; then
+  # We are on NOAA Jet
+  MACHINE_ID=jet
+elif [[ -d /scratch3 ]]; then
+  # We are on NOAA Hera or Ursa
+  if [[ -d /apps/slurm_hera ]]; then
+    # We are on Hera
+    MACHINE_ID=hera
+  else
+    # We are on Ursa
+    MACHINE_ID=ursa
+  fi
+elif [[ -d /work ]]; then
+  # We are on MSU Orion or Hercules
+  if [[ -d /apps/etc ]]; then
+    # We are on Hercules
+    MACHINE_ID=hercules
+  else
+    MACHINE_ID=orion
+  fi
+elif [[ -d /gpfs/f5 && -d /ncrc ]]; then
+  # We are on GAEA C5
+  MACHINE_ID=gaeac5
+elif [[ -d /gpfs/f6 && -d /ncrc ]]; then
+  MACHINE_ID=gaeac6
+elif [[ -d /gpfs/f7 && -d /ncrc ]]; then
+  MACHINE_ID=gaeac7
+elif [[ -d /data/prod ]]; then
+  # We are on SSEC's S4
+  MACHINE_ID=s4
+else
+  echo WARNING: UNKNOWN PLATFORM 1>&2
+fi

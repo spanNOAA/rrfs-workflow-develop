@@ -29,6 +29,8 @@ case ${MACHINE} in
       FIX_RRFS_LOCATION=/gpfs/f5/gsl-glo/world-shared/role.rrfsfix/FIX_RRFS2
     elif [[ -d /gpfs/f6 ]]; then
       FIX_RRFS_LOCATION=/gpfs/f6/bil-fire10-oar/world-shared/role.rrfsfix/FIX_RRFS2
+    elif [[ -d /gpfs/f7 ]]; then
+      FIX_RRFS_LOCATION=/gpfs/f7/wrfruc/world-shared/role.rrfsfix/FIX_RRFS2
     else
       echo "unsupported gaea cluster: ${MACHINE}"
     fi
@@ -51,3 +53,8 @@ ln -snf "${FIX_RRFS_LOCATION}"  "${agent_dir}"
 
 touch "${run_dir}/../../fix/INIT_DONE"
 "${run_dir}"/link_fix_meshes.sh
+
+if [[ -d "${run_dir}/../../sorc/_workaround_/pyDAmonitor" ]]; then
+  mkdir -p "${run_dir}/../sideload/pyDAmonitor/ush"
+  [[ -f "${run_dir}/../../sorc/_workaround_/pyDAmonitor/detect_machine.sh" ]] && cp "${run_dir}/../../sorc/_workaround_/pyDAmonitor/detect_machine.sh" "${run_dir}/../sideload/pyDAmonitor/ush/detect_machine.sh"
+fi

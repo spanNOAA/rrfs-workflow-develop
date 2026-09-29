@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 # First detect w/ hostname
 export MACHINE
-if [[ "${MACHINE:-''}" == "hostgeneric" ]]; then
-  return 0
-fi
 case $(hostname -f) in
 
   adecflow0[12].acorn.wcoss2.ncep.noaa.gov)  MACHINE=acorn ;; ### acorn
@@ -29,6 +26,7 @@ case $(hostname -f) in
   uecflow01) MACHINE=ursa ;;
 
   derecho*) MACHINE=derecho ;;
+  casper*) MACHINE=derecho ;;
 
   s4-submit.ssec.wisc.edu) MACHINE=s4 ;; ### s4
 

@@ -24,7 +24,7 @@ case "${MACHINE}" in
   ursa|orion|hercules|jet|hera)
     compiler_str="intel-mpi-ursa"
     ;;
-  gaeac6|derecho)
+  gaeac6|gaeac7|derecho)
     compiler_str="ifort_icx"
     ;;
 esac
@@ -33,6 +33,12 @@ module purge
 module use "${HOMErrfs}/modulefiles"
 module load "rrfs/${MACHINE}.${COMPILER}"
 module list
+
+if [[ -d "${HOMErrfs}/sorc/_workaround_/MPAS-Model" ]]; then
+  mkdir -p "${HOMErrfs}/sorc/MPAS-Model/ush" "${HOMErrfs}/sorc/MPAS-Model/modulefiles/mpas"
+  [[ -f "${HOMErrfs}/sorc/_workaround_/MPAS-Model/detect_machine.sh" ]] && cp "${HOMErrfs}/sorc/_workaround_/MPAS-Model/detect_machine.sh" "${HOMErrfs}/sorc/MPAS-Model/ush/detect_machine.sh"
+  [[ -f "${HOMErrfs}/sorc/_workaround_/MPAS-Model/gaeac7.intel.lua" ]] && cp "${HOMErrfs}/sorc/_workaround_/MPAS-Model/gaeac7.intel.lua" "${HOMErrfs}/sorc/MPAS-Model/modulefiles/mpas/gaeac7.intel.lua"
+fi
 
 cd "${HOMErrfs}/sorc/MPAS-Model" || exit 1
 make clean CORE=init_atmosphere

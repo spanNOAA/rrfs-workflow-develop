@@ -1,8 +1,8 @@
 help([[
-This module loads libraries for rrfs-workflow
+This module loads libraries for MPAS-Model
 ]])
 
-whatis([===[Loads libraries for rrfs-workflow ]===])
+whatis([===[Loads libraries for MPAS-Model ]===])
 
 prepend_path("MODULEPATH", "/opt/cray/modulefiles")
 prepend_path("MODULEPATH", "/opt/cray/pe/lmod/modulefiles/craype-targets/default")
@@ -11,23 +11,16 @@ prepend_path("MODULEPATH", "/gpfs/f7/wrfruc/world-shared/spack-stack/spack-stack
 
 load("stack-oneapi/2024.2.1")
 load("stack-cray-mpich/8.1.32")
-load("intel-oneapi-mkl/2023.2.0")
 load("cmake/3.27.9")
 load("parallel-netcdf/1.12.3")
 load("parallelio/2.6.2")
-load("jasper/2.0.32")
-load("libpng/1.6.37")
 
 if mode() == "load" then
   setenv("PNETCDF", os.getenv("parallel_netcdf_ROOT"))
-  setenv("NetCDF_C_ROOT", os.getenv("netcdf_c_ROOT"))
-  setenv("NetCDF_FORTRAN_ROOT", os.getenv("netcdf_fortran_ROOT"))
   setenv("LD_PRELOAD", "/lib64/libm.so.6")
 end
 if mode() == "unload" then
   unsetenv("PNETCDF")
-  unsetenv("NetCDF_C_ROOT")
-  unsetenv("NetCDF_FORTRAN_ROOT")
   unsetenv("LD_PRELOAD")
 end
 

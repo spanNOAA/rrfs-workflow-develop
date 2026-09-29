@@ -3,7 +3,11 @@ This module loads libraries for rrfs-workflow
 ]])
 
 whatis([===[Loads libraries for rrfs-workflow ]===])
-prepend_path("MODULEPATH", "/ncrc/proj/epic/spack-stack/c6/spack-stack-1.9.3/envs/ue-oneapi-2024.2.1/install/modulefiles/Core")
+
+prepend_path("MODULEPATH", "/opt/cray/modulefiles")
+prepend_path("MODULEPATH", "/opt/cray/pe/lmod/modulefiles/craype-targets/default")
+prepend_path("MODULEPATH", "/opt/cray/pe/lmod/modulefiles/core")
+prepend_path("MODULEPATH", "/gpfs/f7/wrfruc/world-shared/spack-stack/spack-stack-1.9.3/envs/ue-oneapi-2024.2.1/install/modulefiles/Core")
 
 load("stack-oneapi/2024.2.1")
 load("stack-cray-mpich/8.1.32")
@@ -24,3 +28,8 @@ load("bufr/12.1.0")
 setenv("CMAKE_C_COMPILER", "mpicc")
 setenv("CMAKE_CXX_COMPILER", "mpic++")
 setenv("CMAKE_Fortran_COMPILER", "mpifort")
+
+setenv("AR", "llvm-ar")
+setenv("RANLIB", "llvm-ranlib")
+setenv("CMAKE_AR", "/usr/bin/llvm-ar")
+setenv("CMAKE_RANLIB", "/usr/bin/llvm-ranlib")
