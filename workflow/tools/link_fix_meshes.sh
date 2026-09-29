@@ -7,7 +7,7 @@ run_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 HOMErrfs="${run_dir}/../../"
 
 # gaeac7
-meshdir="/gpfs/f7/wrfruc/world-shared/role.rrfsfix/FIX_MESHES"
+meshdir="/gpfs/f7/wrfruc/world-shared/tmp.rrfsfix/FIX_MESHES"
 if [[ -d "${meshdir}" ]]; then
   ln -snf "${meshdir}"/*km "${HOMErrfs}/fix"
 fi
