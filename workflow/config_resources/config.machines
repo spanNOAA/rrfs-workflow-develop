@@ -48,6 +48,7 @@ elif [[ ${MACHINE} == "gaeac7" ]]; then
   export RESERVATION=${RESERVATION:-""}
   export CLUSTER=${CLUSTER:-c7}
   export NATIVE_UPP="--exclusive"
+  export WALLTIME_PREP_IC="00:30:00"
   export QUEUE_ARCHIVE="hpss"
   export CLUSTER_ARCHIVE=""
   export PARTITION_ARCHIVE=${PARTITION_ARCHIVE:-dtn_f7}
