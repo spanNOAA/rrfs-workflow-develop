@@ -49,6 +49,9 @@ if [[ ${MACHINE,,} == "ursa" ]]; then # special needs at ursa
   export I_MPI_ADJUST_SCATTERV=2
 #  export I_MPI_COLL_INTRANODE=pt2pt
 fi
+if [[ ${MACHINE,,} == "gaeac7" ]]; then # workaround for CMA permission error on C7 RHEL 9 (yama/ptrace_scope=2)
+  export MPICH_SMP_SINGLE_COPY_MODE=NONE
+fi
 #
 echo "load rrfs-workflow modules by default"
 set +x # suppress messy output in the module load process
