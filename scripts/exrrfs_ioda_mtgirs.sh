@@ -21,10 +21,12 @@ export PYTHONPATH="${PYIODALIB}:${PYTHONPATH}"
 
 # Configuration parameters
 obspath_raw="${OBSPATH_MTGIRS:-""}"
-quadrants="${MTG_IRS_QUADRANTS:-"Q3 Q4"}"
+export MTG_IRS_QUADRANTS="${MTG_IRS_QUADRANTS:-"Q3 Q4"}"
 window_min="${MTG_IRS_WINDOW:-15}"
 res="${MTG_IRS_RESOLUTION:-16}"
 base_ev="${FIXrrfs}/jedi/RSP_OPE_BASEEV_MTS1+IRS_20240924000000_V1.h5"
+
+echo "Processing MTG-IRS with quadrants: ${MTG_IRS_QUADRANTS}, window: +/-${window_min}m, resolution: ${res}"
 
 if [[ ! -f "${base_ev}" ]]; then
   # Fallback to test ancillary location if not yet populated in FIXrrfs
@@ -110,6 +112,8 @@ echo "Total MTG-IRS files to process: ${num_files}"
 nthreads=${SLURM_CPUS_ON_NODE:-${SLURM_NTASKS:-40}}
 echo "Running irs_2ioda.py with ${nthreads} threads..."
 
+mapfile -t input_files < file_list.txt
+
 python3 irs_2ioda.py \
   -d "${CDATE}" \
   --baseEV "${base_ev}" \
@@ -117,7 +121,7 @@ python3 irs_2ioda.py \
   --include_reconstructed_radiance \
   -j "${nthreads}" \
   -o "ioda_mtgirs.nc" \
-  -i $(< file_list.txt)
+  -i "${input_files[@]}"
 err=$?
 
 if [[ ${err} -ne 0 ]]; then
@@ -130,7 +134,8 @@ if [[ ! -s "ioda_mtgirs.nc" ]]; then
   exit 1
 fi
 
-echo "Successfully generated ioda_mtgirs.nc ($(ls -lh ioda_mtgirs.nc | awk '{print $5}'))"
+echo "Successfully generated ioda_mtgirs.nc:"
+ls -lh ioda_mtgirs.nc
 ${cpreq} "ioda_mtgirs.nc" "${COMOUT}/ioda_mtgirs/${WGF}/ioda_mtgirs.nc"
 
 echo "exrrfs_ioda_mtgirs completed normally."
