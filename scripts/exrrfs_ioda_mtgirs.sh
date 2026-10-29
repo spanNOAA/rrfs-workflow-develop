@@ -7,9 +7,9 @@ cpreq=${cpreq:-cpreq}
 cd "${DATA}" || exit 1
 
 HOMErdasapp=${HOMErrfs}/sorc/RDASApp
-if [[ -f "${EXECrrfs}/irs_2ioda.py" ]]; then
+if [[ -s "${EXECrrfs}/irs_2ioda.py" ]]; then
   ${cpreq} "${EXECrrfs}"/irs_2ioda.py .
-elif [[ -f "${HOMErdasapp}/build/bin/irs_2ioda.py" ]]; then
+elif [[ -s "${HOMErdasapp}/build/bin/irs_2ioda.py" ]]; then
   ${cpreq} "${HOMErdasapp}"/build/bin/irs_2ioda.py .
 else
   ${cpreq} "${HOMErdasapp}"/sorc/iodaconv/src/satpy/irs_2ioda.py .
@@ -28,7 +28,7 @@ base_ev="${FIXrrfs}/jedi/RSP_OPE_BASEEV_MTS1+IRS_20240924000000_V1.h5"
 
 echo "Processing MTG-IRS with quadrants: ${MTG_IRS_QUADRANTS}, window: +/-${window_min}m, resolution: ${res}"
 
-if [[ ! -f "${base_ev}" ]]; then
+if [[ ! -s "${base_ev}" ]]; then
   # Fallback to test ancillary location if not yet populated in FIXrrfs
   base_ev="/gpfs/f7/wrfruc/scratch/Sijie.Pan/AR3.5KM/wx-workflow/fix/jedi/RSP_OPE_BASEEV_MTS1+IRS_20240924000000_V1.h5"
 fi
@@ -114,7 +114,7 @@ echo "Running irs_2ioda.py with ${nthreads} threads..."
 
 mapfile -t input_files < file_list.txt
 
-python3 irs_2ioda.py \
+./irs_2ioda.py \
   -d "${CDATE}" \
   --baseEV "${base_ev}" \
   --resolution "${res}" \
@@ -124,7 +124,7 @@ python3 irs_2ioda.py \
   -i "${input_files[@]}"
 err=$?
 
-if [[ ${err} -ne 0 ]]; then
+if (( err != 0 )); then
   echo "FATAL ERROR: irs_2ioda.py failed with return code ${err}."
   exit 1
 fi
